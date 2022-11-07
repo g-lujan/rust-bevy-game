@@ -105,21 +105,24 @@ pub fn load_map(
         match layer.layer_type.as_str() {
             "tilelayer" => {
                 let mut dst_tile_x: u32 = 0;
-                let mut dst_tile_y: u32 = tile_map.height - 1;
+                let mut dst_tile_y: u32 = 0;
                 for tile_data in layer.data {
-                    if tile_data == 0 {
-                        continue;
-                    }
-                    if dst_tile_x == tile_map.width {
-                        dst_tile_y -= 1;
+                    if dst_tile_x >= tile_map.width {
+                        dst_tile_y += 1;
                         dst_tile_x = 0;
+                    }
+                    if tile_data == 0 {
+                        dst_tile_x += 1;
+                        continue;
                     }
                     commands.spawn_bundle(SpriteSheetBundle {
                         texture_atlas: texture_atlas_handle.clone(),
                         transform: Transform {
                             translation: Vec3::from((
-                                (dst_tile_x * 32) as f32,
-                                (dst_tile_y * 32) as f32,
+                                (dst_tile_x * tileset.tilewidth) as f32
+                                    - (tile_map.width / 2) as f32 + (tileset.tilewidth/2) as f32,
+                                -((dst_tile_y * tileset.tileheight) as f32)
+                                    + (tile_map.height / 2)  as f32 - (tileset.tileheight/2) as f32,
                                 0f32,
                             )),
                             rotation: Quat::from_rotation_z(tile_rotation(tile_data)),
@@ -142,7 +145,13 @@ pub fn load_map(
                             },
                             collision: Vec::new(),
                         })
-                        .insert(Transform::from_xyz(object.x, (-object.y) + tile_map.height as f32, 0.0));
+                        .insert(Transform::from_xyz(
+                            object.x - (tile_map.width / 2) as f32 + object.width/2f32,     // center pos
+                            (-object.y) + (tile_map.height / 2) as f32 - object.height/2f32, // center pos
+                            0f32,
+                        ));
+                        info!("x: {:?}", object.x - (tile_map.width / 2) as f32);
+                        info!("y: {:?}", (-object.y) + (tile_map.height / 2) as f32);
                 }
             }
             _ => (),

@@ -25,7 +25,7 @@ fn main() {
         .add_system(player_input)
         .add_system(player_movement)
         .add_system(camera_follow_player)
-        .add_system(check_for_collisions)
+        .add_system(check_for_collisions.before(player_movement))
         .run();
 }
 

@@ -17,7 +17,6 @@ pub fn player_movement(
     let time_delta = time.delta_seconds();
     for (player, mut transform, velocity, mut collider) in players.iter_mut() {
         for collision in &collider.collision {
-            info!("Entered game level: {}", 1);
             match collision {
                 Collision::Left => transform.translation.x += 1.0,
                 Collision::Right => transform.translation.x -= 1.0,
@@ -26,6 +25,7 @@ pub fn player_movement(
                 Collision::Inside => transform.translation.y += time_delta * world::GRAVITY,
             }
         }
+        info!("player y: {}", transform.translation.y);
         collider.collision.clear();
         match player.state {
             ActorState::WALKING => {
@@ -64,12 +64,11 @@ pub fn check_for_collisions(
     // check collision with walls
     for (transform, collider) in collider_query.iter() {
         if let Some(collide) = collide(
-            player_transform.translation,
-            player_collider.bound,
             transform.translation,
             collider.bound,
+            player_transform.translation,
+            player_collider.bound,
         ) {
-            info!("fuck");
             player_collider.collision.push(collide);
         }
     }

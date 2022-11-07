@@ -20,5 +20,5 @@ pub(crate) mod tile {
 }
 
 pub(crate) mod world {
-    pub const GRAVITY: f32 = 50.0;
+    pub const GRAVITY: f32 = 100.0;
 }
