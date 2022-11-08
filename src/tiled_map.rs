@@ -117,14 +117,14 @@ pub fn load_map(
                     commands.spawn_bundle(SpriteSheetBundle {
                         texture_atlas: texture_atlas_handle.clone(),
                         transform: Transform {
-                            translation: Vec3::from(tiled_to_bevy_coord(
+                            translation: tiled_to_bevy_coord(
                                 (curr_tile_col * tileset.tilewidth) as f32,
                                 (curr_tile_line * tileset.tileheight) as f32,
                                 tileset.tilewidth as f32,
                                 tileset.tileheight as f32,
                                 tile_map.width,
                                 tile_map.height,
-                            )),
+                            ),
                             rotation: Quat::from_rotation_z(tile_rotation(tile_data)),
                             scale: Vec3::ONE,
                         },
@@ -136,14 +136,6 @@ pub fn load_map(
             }
             "objectgroup" => {
                 for object in layer.objects {
-                    let bevy_coords = tiled_to_bevy_coord(
-                        object.x,
-                        object.y,
-                        object.width,
-                        object.height,
-                        tile_map.width,
-                        tile_map.height,
-                    );
                     commands
                         .spawn()
                         .insert(Collider {
@@ -153,11 +145,14 @@ pub fn load_map(
                             },
                             collision: Vec::new(),
                         })
-                        .insert(Transform::from_xyz(
-                            bevy_coords.0,
-                            bevy_coords.1,
-                            bevy_coords.2,
-                        ));
+                        .insert(Transform::from_translation(tiled_to_bevy_coord(
+                            object.x,
+                            object.y,
+                            object.width,
+                            object.height,
+                            tile_map.width,
+                            tile_map.height,
+                        )));
                 }
             }
             _ => (),
@@ -209,8 +204,8 @@ fn tiled_to_bevy_coord(
     height: f32,
     map_width: u32,
     map_height: u32,
-) -> (f32, f32, f32) {
-    (
+) -> Vec3 {
+    Vec3::new(
         tiled_x - (map_width as f32 / 2f32) + (width as f32 / 2f32),
         -tiled_y + (map_height as f32 / 2f32) - (height as f32 / 2f32),
         0f32,

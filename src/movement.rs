@@ -20,9 +20,9 @@ pub fn player_movement(
         match collision {
             Collision::Left => transform.translation.x += 1.0,
             Collision::Right => transform.translation.x -= 1.0,
-            Collision::Top => transform.translation.y += time_delta * world::GRAVITY,
+            Collision::Top => todo!(),
             Collision::Bottom => transform.translation.y += time_delta * world::GRAVITY,
-            Collision::Inside => transform.translation.y += time_delta * world::GRAVITY,
+            Collision::Inside => todo!(),
         }
     }
     collider.collision.clear(); // collisions resolved
@@ -30,7 +30,6 @@ pub fn player_movement(
         ActorState::WALKING => transform.translation.x += time_delta * velocity.x,
         _ => (),
     }
-    // apply gravity
     transform.translation.y -= time_delta * world::GRAVITY;
 }
 
