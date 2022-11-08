@@ -1,5 +1,5 @@
 use bevy::{prelude::*, render::texture::ImageSettings};
-use movement::{camera_follow_player, check_for_collisions};
+use movement::{camera_follow_player, check_player_collisions};
 use tiled_map::load_map;
 
 mod animation;
@@ -20,12 +20,12 @@ fn main() {
         .add_plugins(DefaultPlugins)
         .add_startup_system(setup)
         .add_startup_system(load_map)
-        .add_system(play_animations)
-        .add_system(animate_actor)
-        .add_system(player_input)
+        .add_system(player_input.before(player_movement))
+        .add_system(check_player_collisions.before(player_movement))
         .add_system(player_movement)
-        .add_system(camera_follow_player)
-        .add_system(check_for_collisions.before(player_movement))
+        .add_system(animate_actor.after(player_movement))
+        .add_system(camera_follow_player.after(player_movement))
+        .add_system(play_animations.after(animate_actor))
         .run();
 }
 
