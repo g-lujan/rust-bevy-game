@@ -46,21 +46,19 @@ pub fn animate_actor(
 ) {
     for (player, velocity, mut animation, mut sprite) in query.iter_mut() {
         let current_line = sprite.index / tile::PLAYER_FRAMES;
-        match player.state {
-            ActorState::WALKING => {
-                if current_line != 0 {
-                    sprite.index = 0;
-                }
-                animation.timer.set_duration(Duration::from_secs_f32(0.1));
-                sprite.flip_x = if velocity.x > 0.0 { false } else { true };
+        if player.state.contains(&ActorState::WALKING) {
+            if current_line != 0 {
+                sprite.index = 0;
             }
-            ActorState::IDLE => {
-                if current_line != 1 {
-                    sprite.index = 8; // index of start of idle animation
-                    animation.timer.set_duration(Duration::from_secs_f32(0.3));
-                }
+            animation.timer.set_duration(Duration::from_secs_f32(0.1));
+            sprite.flip_x = if velocity.x > 0.0 { false } else { true };
+        }
+
+        if player.state.is_empty() {
+            if current_line != 1 {
+                sprite.index = 8; // index of start of idle animation
+                animation.timer.set_duration(Duration::from_secs_f32(0.3));
             }
-            _ => (),
         }
     }
 }

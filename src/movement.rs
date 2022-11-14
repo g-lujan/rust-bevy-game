@@ -12,25 +12,31 @@ use crate::{
 
 pub fn player_movement(
     time: Res<Time>,
-    mut player_query: Query<(&Player, &mut Transform, &Velocity, &mut Collider)>,
+    mut player_query: Query<(&mut Player, &mut Transform, &mut Velocity, &mut Collider)>,
 ) {
     let time_delta = time.delta_seconds();
-    let (player, mut transform, velocity, mut collider) = player_query.single_mut();
+    let (mut player, mut transform, mut velocity, mut collider) = player_query.single_mut();
     for collision in &collider.collision {
         match collision {
             Collision::Left => transform.translation.x += 1.0,
             Collision::Right => transform.translation.x -= 1.0,
-            Collision::Top => todo!(),
-            Collision::Bottom => transform.translation.y += time_delta * world::GRAVITY,
-            Collision::Inside => todo!(),
+            Collision::Top => (),
+            Collision::Bottom => {
+                player.grounded = true;
+            },
+            Collision::Inside => (),
         }
     }
     collider.collision.clear(); // collisions resolved
-    match player.state {
-        ActorState::WALKING => transform.translation.x += time_delta * velocity.x,
-        _ => (),
+    if player.state.contains(&ActorState::WALKING) {
+        transform.translation.x += time_delta * velocity.x;
     }
-    transform.translation.y -= time_delta * world::GRAVITY;
+    if !player.grounded {
+        transform.translation.y += time_delta * (velocity.y - world::GRAVITY);
+        velocity.y -= 5.0;
+    } else {
+        transform.translation.y += if velocity.y > 0.0 {time_delta * velocity.y} else {0.0};
+    }
 }
 
 // Only supports a single player. To support multiple, adding a Tag component

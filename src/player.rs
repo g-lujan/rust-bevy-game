@@ -6,6 +6,7 @@ use crate::constants::tile;
 use crate::physics::Collider;
 use crate::physics::Velocity;
 
+#[derive(PartialEq)]
 pub enum ActorState {
     IDLE,
     WALKING,
@@ -16,7 +17,8 @@ pub enum ActorState {
 #[derive(Component)]
 pub struct Player {
     pub name: String,
-    pub state: ActorState,
+    pub state: Vec<ActorState>,
+    pub grounded: bool,
 }
 
 pub fn spawn_player(
@@ -39,8 +41,9 @@ pub fn spawn_player(
             timer: Timer::from_seconds(0.1, true),
         })
         .insert(Player {
-            state: ActorState::IDLE,
+            state: vec!(ActorState::IDLE),
             name: "Player1".to_string(),
+            grounded: false,
         })
         .insert(Transform::from_xyz(200.0, 200.0, 0.0))
         .insert(Collider {

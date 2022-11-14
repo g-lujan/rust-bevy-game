@@ -9,14 +9,19 @@ pub fn player_input(
     mut query: Query<(&mut Player, &mut Velocity, &mut Collider)>,
 ) {
     for (mut player, mut velocity, collider) in query.iter_mut() {
+        player.state.clear();
         if keyboard_input.pressed(KeyCode::Left) {
-            player.state = ActorState::WALKING;
+            player.state.push(ActorState::WALKING);
             velocity.x = -50.0;
-        } else if keyboard_input.pressed(KeyCode::Right) {
-            player.state = ActorState::WALKING;
+        } 
+        if keyboard_input.pressed(KeyCode::Right) {
+            player.state.push(ActorState::WALKING);
             velocity.x = 50.0;
-        } else {
-            player.state = ActorState::IDLE;
+        }
+        if keyboard_input.pressed(KeyCode::Space) && player.grounded {
+            player.state.push(ActorState::JUMPING);
+            velocity.y = 300.0;
+            player.grounded = false;
         }
     }
 }
